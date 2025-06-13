@@ -8,7 +8,7 @@ import {
   WiFog
 } from 'weather-icons-react';
 
-const API_KEY = 'YOUR_OPENWEATHERMAP_API_KEY'; // Replace with actual API key
+const API_KEY = 'fd0e1b1f6066fe977fb8bd1a11cddc45';
 
 const WeatherForecasting = () => {
   const [city, setCity] = useState('');
