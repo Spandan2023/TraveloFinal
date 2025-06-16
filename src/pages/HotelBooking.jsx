@@ -12,45 +12,68 @@ const calculateNights = (checkIn, checkOut) => {
 
 const HotelCard = ({ hotel, selected, onSelect }) => (
   <div
-    className={`bg-gray-800 rounded-lg p-0 shadow-lg overflow-hidden border-2 transition cursor-pointer ${
-      selected ? 'border-blue-500' : 'border-gray-700 hover:border-blue-400'
-    }`}
-    onClick={() => onSelect(hotel)}
-  >
-    <div className="h-48 overflow-hidden">
-      <img src={hotel.imageUrl} alt={hotel.hotelName} className="w-full h-full object-cover" />
+  className={`backdrop-blur-xs bg-white/10 rounded-3xl shadow-2xl border border-white/20 transition cursor-pointer overflow-hidden ${
+    selected ? 'border-blue-400 shadow-blue-500/50' : 'hover:border-blue-400'
+  }`}
+  onClick={() => onSelect(hotel)}
+>
+  <div className="h-52 overflow-hidden rounded-t-3xl">
+    <img
+  src={
+    hotel.image
+      ? hotel.image.startsWith('data:image')
+        ? hotel.image
+        : `data:image/jpeg;base64,${hotel.image}`
+      : "/assets/Phuket3-2.jpg"
+  }
+  alt={hotel.hotelName}
+  onError={(e) => {
+    e.target.onerror = null;
+    e.target.src = "/assets/Phuket3-2.jpg";
+  }}
+  className="w-full h-full object-cover"
+/>
+
+  </div>
+  <div className="p-6">
+    <div className="flex justify-between items-start">
+      <div>
+        <h2 className="text-xl font-semibold mb-1">{hotel.hotelName}</h2>
+        <p className="text-gray-300 text-sm">{hotel.location}</p>
+      </div>
+      <div className="flex items-center bg-gradient-to-br from-yellow-400 to-yellow-600 px-3 py-1 rounded-full shadow-md text-sm">
+        ★ {hotel.rating}
+      </div>
     </div>
-    <div className="p-6">
-      <div className="flex justify-between items-start">
-        <div>
-          <h2 className="text-xl font-semibold mb-1">{hotel.hotelName}</h2>
-          <p className="text-gray-400 mb-2">{hotel.location}</p>
-        </div>
-        <div className="flex items-center bg-gray-700 px-2 py-1 rounded">
-          <span className="text-yellow-400">★</span>
-          <span className="ml-1">{hotel.rating}</span>
-        </div>
-      </div>
 
-      <div className="my-3">
-        {(hotel.amenities?.split(',') || []).map((amenity, i) => (
-          <span key={i} className="inline-block bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded mr-2 mb-2">
-            {amenity.trim()}
-          </span>
-        ))}
-      </div>
-
-      <div className="flex justify-between items-center mt-4">
-        <p className="text-2xl font-bold">
-          ${hotel.pricePerNight} <span className="text-sm text-gray-400 font-normal">/ night</span>
-        </p>
-        <span className={`text-xs px-2 py-1 rounded ${hotel.available ? 'bg-green-600' : 'bg-red-600'}`}>
-          {hotel.available ? 'Available' : 'Booked'}
+    <div className="my-3 flex flex-wrap gap-2">
+      {(hotel.amenities?.split(',') || []).map((amenity, i) => (
+        <span
+          key={i}
+          className="bg-gray-700/80 text-gray-100 text-xs px-3 py-1 rounded-full shadow-inner"
+        >
+          {amenity.trim()}
         </span>
-      </div>
+      ))}
+    </div>
+
+    <div className="flex justify-between items-center mt-4">
+      <p className="text-xl font-bold">${hotel.pricePerNight}
+        <span className="text-sm font-normal text-gray-300 ml-1">/night</span>
+      </p>
+      <span className={`text-xs px-3 py-1 rounded-full text-white shadow-md ${
+        hotel.available
+          ? 'bg-gradient-to-r from-green-400 to-green-600'
+          : 'bg-gradient-to-r from-red-400 to-red-600'
+      }`}>
+        {hotel.available ? 'Available' : 'Booked'}
+      </span>
     </div>
   </div>
-);
+</div>
+)
+
+
 
 const HotelDetailsModal = ({ hotel, checkIn, checkOut, nights, onClose, onBook, isBooking }) => {
   const totalPrice = nights * hotel.pricePerNight + TAXES_FEES;
@@ -152,6 +175,42 @@ const HotelBooking = () => {
       .catch(err => console.error(err));
   }, []);
 
+  // === Inside HotelBooking Component useEffect ===
+// Add this inside useEffect or as a separate useEffect after hotel fetch
+useEffect(() => {
+  let filtered = [...hotels];
+
+  if (location.trim() !== '') {
+    filtered = filtered.filter(hotel =>
+      hotel.location.toLowerCase().includes(location.toLowerCase())
+    );
+  }
+
+  if (availabilityOnly) {
+    filtered = filtered.filter(h => h.available);
+  }
+
+  switch (sortOption) {
+    case 'priceLowHigh':
+      filtered.sort((a, b) => a.pricePerNight - b.pricePerNight);
+      break;
+    case 'priceHighLow':
+      filtered.sort((a, b) => b.pricePerNight - a.pricePerNight);
+      break;
+    case 'ratingLowHigh':
+      filtered.sort((a, b) => a.rating - b.rating);
+      break;
+    case 'ratingHighLow':
+      filtered.sort((a, b) => b.rating - a.rating);
+      break;
+    default:
+      break;
+  }
+
+  setFilteredHotels(filtered);
+}, [location, availabilityOnly, sortOption, hotels]);
+
+
   useEffect(() => {
     let filtered = [...hotels];
 
@@ -186,28 +245,50 @@ const HotelBooking = () => {
       <h1 className="text-4xl font-bold mb-6 text-center">Hotel Booking</h1>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <input type="text" placeholder="Location" value={location} onChange={(e) => setLocation(e.target.value)}
-          className="bg-gray-800 p-3 rounded text-white" />
-        <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)}
-          className="bg-gray-800 p-3 rounded text-white" />
-        <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)}
-          className="bg-gray-800 p-3 rounded text-white" />
-        <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}
-          className="bg-gray-800 p-3 rounded text-white">
-          <option value="">Sort By</option>
-          <option value="priceLowHigh">Price: Low to High</option>
-          <option value="priceHighLow">Price: High to Low</option>
-          <option value="ratingHighLow">Rating: High to Low</option>
-          <option value="ratingLowHigh">Rating: Low to High</option>
-        </select>
-      </div>
+  <input
+    type="text"
+    placeholder="Location"
+    value={location}
+    onChange={(e) => setLocation(e.target.value)}
+    className="bg-white/60 backdrop-blur-md p-3 rounded-xl text-black placeholder:text-black/70 shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+  />
+  <input
+    type="date"
+    value={checkIn}
+    onChange={(e) => setCheckIn(e.target.value)}
+    className="bg-white/60 backdrop-blur-md p-3 rounded-xl text-black placeholder:text-black/70 shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+  />
+  <input
+    type="date"
+    value={checkOut}
+    onChange={(e) => setCheckOut(e.target.value)}
+    className="bg-white/60 backdrop-blur-md p-3 rounded-xl text-black placeholder:text-black/70 shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+  />
+  <select
+    value={sortOption}
+    onChange={(e) => setSortOption(e.target.value)}
+    className="bg-white/60 backdrop-blur-md p-3 rounded-xl text-black shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+  >
+    <option value="">Sort By</option>
+    <option value="priceLowHigh">Price: Low to High</option>
+    <option value="priceHighLow">Price: High to Low</option>
+    <option value="ratingHighLow">Rating: High to Low</option>
+    <option value="ratingLowHigh">Rating: Low to High</option>
+  </select>
+</div>
 
-      <div className="flex justify-center gap-4 mb-8">
-        <label className="flex items-center gap-2">
-          <input type="checkbox" checked={availabilityOnly} onChange={() => setAvailabilityOnly(!availabilityOnly)} />
-          Show only Available Hotels
-        </label>
-      </div>
+<div className="flex justify-center gap-4 mb-8">
+  <label className="flex items-center gap-2 text-black font-medium bg-white/60 backdrop-blur-md px-4 py-2 rounded-full shadow-inner cursor-pointer transition hover:shadow-md">
+    <input
+      type="checkbox"
+      checked={availabilityOnly}
+      onChange={() => setAvailabilityOnly(!availabilityOnly)}
+      className="accent-blue-600 w-4 h-4"
+    />
+    <span className="text-sm">Show only Available Hotels</span>
+  </label>
+</div>
+
 
       {filteredHotels.length === 0 ? (
         <p className="text-center text-gray-400">No hotels found.</p>

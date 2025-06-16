@@ -10,11 +10,12 @@ const PaymentGateway = () => {
 
   const [formData, setFormData] = useState({
     cardName: '',
+    email: '',
     cardNumber: '',
     expiry: '',
     cvv: '',
     upiId: '',
-    paymentMethod: 'Credit Card',
+    paymentMethod: '',
   });
 
   const [paymentStatus, setPaymentStatus] = useState(null);
@@ -75,18 +76,16 @@ const PaymentGateway = () => {
       formData.paymentMethod === 'Credit Card' ? isCardValid : isUpiValid;
 
     if (isPaymentValid) {
-      const transactionId = `TRX-${Math.floor(Math.random() * 1000000)}`;
+      const transactionId = `TRX-${Math.floor(Math.random() * 1000000000000000)}`;
       try {
         const response = await axios.post('http://localhost:8080/api/payments/process', {
-          
-            userEmail: currentUser.email,
-            hotelName: bookingDetails.hotel.name,
-            checkIn: bookingDetails.checkIn,
-            checkOut: bookingDetails.checkOut,
-            amount: bookingDetails.total,
-            paymentMethod: formData.paymentMethod
-
-          });
+          userEmail: currentUser.email,
+          hotelName: bookingDetails.hotel.name,
+          checkIn: bookingDetails.checkIn,
+          checkOut: bookingDetails.checkOut,
+          amount: bookingDetails.total,
+          paymentMethod: formData.paymentMethod
+        });
 
         if (response.status === 200 || response.status === 201) {
           setPaymentStatus({
@@ -122,114 +121,182 @@ const PaymentGateway = () => {
     return <div className="text-white text-center py-8 px-4">Loading booking details...</div>;
   }
 
+  const inputStyle = "w-full px-4 py-2 rounded-lg border bg-[#1e1e1e] border-gray-600 placeholder-white text-white";
+  const isCardDisabled = formData.paymentMethod !== 'Credit Card';
+  const isUpiSelected = formData.paymentMethod === 'Google Pay' || formData.paymentMethod === 'PhonePe';
+
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div>
-        {!paymentStatus?.success ? (
-          <form
-            onSubmit={handleSubmit}
-            className="bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700"
-            noValidate
-          >
-            <h2 className="text-xl font-semibold mb-4 text-white">Card Payment</h2>
-            <div className="mb-4">
-              <label className="block text-gray-400 text-sm mb-1">Name on Card</label>
-              <input name="cardName" value={formData.cardName} onChange={handleChange} type="text" className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-400 text-sm mb-1">Card Number</label>
-              <input name="cardNumber" value={formData.cardNumber} onChange={handleChange} type="text" maxLength={19} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" />
-            </div>
-            <div className="grid grid-cols-2 gap-4 mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-white via-green-100 to-orange-200 py-10 px-6 font-sans">
+      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8">
+        <div className={`rounded-2xl p-6 shadow-xl border-2 border-orange-300 bg-white/20 backdrop-blur-md ${paymentStatus?.success ? 'text-center' : ''}`}>
+          {!paymentStatus?.success ? (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <h2 className="text-2xl font-bold text-black">Card Payment</h2>
               <div>
-                <label className="block text-gray-400 text-sm mb-1">Expiry Date</label>
-                <input name="expiry" value={formData.expiry} onChange={handleChange} type="month" className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" />
+                <label className="block text-black text-sm mb-1">Email id</label>
+                <input
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  type="email"
+                  className={inputStyle}
+                  placeholder="you@example.com"
+                />
               </div>
               <div>
-                <label className="block text-gray-400 text-sm mb-1">CVV</label>
-                <input name="cvv" value={formData.cvv} onChange={handleChange} type="password" maxLength={3} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" />
+                <label className="block text-black text-sm mb-1">Name on Card</label>
+                <input
+                  name="cardName"
+                  value={formData.cardName}
+                  onChange={handleChange}
+                  type="text"
+                  className={`${inputStyle} ${isCardDisabled ? 'opacity-60' : ''}`}
+                  disabled={isCardDisabled}
+                  placeholder="John Doe"
+                />
               </div>
-            </div>
-
-            <h2 className="text-xl font-semibold mb-4 text-white">UPI Payment</h2>
-            <div className="flex gap-4 mb-4">
-              <label className="text-gray-400">
-                <input type="radio" name="paymentMethod" value="Google Pay" checked={formData.paymentMethod === 'Google Pay'} onChange={handleChange} className="mr-2" />
-                Google Pay
-              </label>
-              <label className="text-gray-400">
-                <input type="radio" name="paymentMethod" value="PhonePe" checked={formData.paymentMethod === 'PhonePe'} onChange={handleChange} className="mr-2" />
-                PhonePe
-              </label>
-              <label className="text-gray-400">
-                <input type="radio" name="paymentMethod" value="Credit Card" checked={formData.paymentMethod === 'Credit Card'} onChange={handleChange} className="mr-2" />
-                Credit Card
-              </label>
-            </div>
-
-            {(formData.paymentMethod === 'Google Pay' || formData.paymentMethod === 'PhonePe') && (
-              <div className="mb-6">
-                <label className="block text-gray-400 text-sm mb-1">Enter your UPI ID</label>
-                <input name="upiId" value={formData.upiId} onChange={handleChange} type="text" placeholder="example@upi" className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" />
+              <div>
+                <label className="block text-black text-sm mb-1">Card Number</label>
+                <input
+                  name="cardNumber"
+                  value={formData.cardNumber}
+                  onChange={handleChange}
+                  type="text"
+                  maxLength={19}
+                  className={`${inputStyle} font-[Times New Roman] tracking-widest ${isCardDisabled ? 'opacity-60' : ''}`}
+                  disabled={isCardDisabled}
+                  placeholder="1234 5678 9012 3456"
+                />
               </div>
-            )}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-black text-sm mb-1">Expiry Date</label>
+                  <input
+                    name="expiry"
+                    value={formData.expiry}
+                    onChange={handleChange}
+                    type="month"
+                    className={`${inputStyle} ${isCardDisabled ? 'opacity-60' : ''}`}
+                    disabled={isCardDisabled}
+                  />
+                </div>
+                <div>
+                  <label className="block text-black text-sm mb-1">CVV</label>
+                  <input
+                    name="cvv"
+                    value={formData.cvv}
+                    onChange={handleChange}
+                    type="password"
+                    maxLength={3}
+                    className={`${inputStyle} font-[Times New Roman] ${isCardDisabled ? 'opacity-60' : ''}`}
+                    disabled={isCardDisabled}
+                  />
+                </div>
+              </div>
 
-            {paymentStatus && !paymentStatus.success && (
-              <div className="bg-red-900 text-red-200 p-3 rounded-lg mb-4">{paymentStatus.message}</div>
-            )}
+              <h2 className="text-2xl font-bold text-black mt-6">UPI Payment</h2>
+              <div className="flex gap-4 mb-3">
+                {['Google Pay', 'PhonePe', 'Credit Card'].map((method) => (
+                  <label key={method} className="text-black flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value={method}
+                      checked={formData.paymentMethod === method}
+                      onChange={handleChange}
+                      className="w-5 h-5 accent-orange-400"
+                    />
+                    <span>{method}</span>
+                  </label>
+                ))}
+              </div>
 
-            <button type="submit" disabled={loading} className={`w-full py-3 rounded-lg font-bold transition ${loading ? 'bg-blue-700 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
-              {loading ? 'Processing Payment...' : 'Pay Now'}
-            </button>
-          </form>
-        ) : (
-          <div className="bg-gray-800 rounded-lg p-6 shadow-lg border border-green-600 text-center">
-            <div className="text-green-400 text-5xl mb-4">✓</div>
-            <h2 className="text-2xl font-bold mb-2">Payment Successful!</h2>
-            <p className="text-gray-300 mb-4">{paymentStatus.message}</p>
-            <p className="text-gray-400 text-sm mb-6">Transaction ID: <code>{paymentStatus.transactionId}</code></p>
-            <div className="bg-gray-700 p-4 rounded-lg mb-6">
-              <h3 className="font-semibold mb-2">Booking Confirmation</h3>
-              <p className="text-sm text-gray-300">We've sent the booking details to <strong>{currentUser.email}</strong>.</p>
+              {isUpiSelected && (
+                <div>
+                  <label className="block text-black text-sm mb-1">Enter your UPI ID</label>
+                  <input
+                    name="upiId"
+                    value={formData.upiId}
+                    onChange={handleChange}
+                    type="text"
+                    className={`${inputStyle} ring-2 ring-green-300`}
+                    placeholder="example@upi"
+                  />
+                </div>
+              )}
+
+              {paymentStatus && !paymentStatus.success && (
+                <div className="bg-red-600/80 text-white p-3 rounded-lg">{paymentStatus.message}</div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full py-3 rounded-lg font-bold text-white bg-gradient-to-r from-green-400 to-orange-400 hover:from-green-500 hover:to-orange-500 transition`}
+              >
+                {loading ? 'Processing Payment...' : 'Pay Now'}
+              </button>
+            </form>
+          ) : (
+            <div className="text-white space-y-4">
+              <div className="text-green-800 text-5xl">✓</div>
+              <h2 className="text-2xl font-bold text-black">Payment Successful!</h2>
+              <p className="text-black">{paymentStatus.message}</p>
+              <p className="text-sm text-black">
+                Transaction ID: <code className="text-black">{paymentStatus.transactionId}</code>
+              </p>
+
+              <div className="bg-gray-700/50 p-4 rounded-lg">
+                <h3 className="font-semibold text-black">Booking Confirmation</h3>
+                <p className="text-sm text-black">
+                  We've sent the booking details to <strong className="text-black">{currentUser.email}</strong>.
+                </p>
+              </div>
+
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-2 rounded-lg text-white font-semibold"
+              >
+                Go to Dashboard
+              </button>
             </div>
-            <button onClick={() => navigate('/dashboard')} className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-medium transition">Go to Dashboard</button>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      <div className="bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
-        <h2 className="text-xl font-semibold mb-4 text-white">Booking Summary</h2>
-        <div className="flex items-start mb-4">
-          <img src={bookingDetails.hotel.image} alt={bookingDetails.hotel.name} className="w-24 h-24 object-cover rounded-lg mr-4" />
-          <div>
-            <h3 className="font-bold">{bookingDetails.hotel.name}</h3>
-            <p className="text-gray-400 text-sm">{bookingDetails.hotel.location}</p>
-            <p className="text-blue-400 mt-1">${bookingDetails.hotel.pricePerNight.toFixed(2)} per night</p>
-            <p className="text-gray-400 text-sm mt-1">{bookingDetails.nights} night(s)</p>
+        <div className="rounded-2xl p-6 shadow-xl border-2 border-red-300 bg-white/20 backdrop-blur-md">
+          <h2 className="text-2xl font-bold mb-4 text-black">Booking Summary</h2>
+          <div className="flex items-start mb-4">
+            <img src={bookingDetails.hotel.image} alt={bookingDetails.hotel.name} className="w-24 h-24 object-cover rounded-lg mr-4" />
+            <div>
+              <h3 className="font-bold text-black">{bookingDetails.hotel.name}</h3>
+              <p className="text-black text-sm">{bookingDetails.hotel.location}</p>
+              <p className="text-green-300 mt-1">${bookingDetails.hotel.pricePerNight.toFixed(2)} per night</p>
+              <p className="text-black text-sm mt-1">{bookingDetails.nights} night(s)</p>
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <p className="text-gray-400 text-sm">Check-in</p>
-            <p>{new Date(bookingDetails.checkIn).toLocaleDateString()}</p>
+          <div className="grid grid-cols-2 gap-4 mb-4 text-black">
+            <div>
+              <p className="text-sm text-black">Check-in</p>
+              <p>{new Date(bookingDetails.checkIn).toLocaleDateString()}</p>
+            </div>
+            <div>
+              <p className="text-sm text-black">Check-out</p>
+              <p>{new Date(bookingDetails.checkOut).toLocaleDateString()}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-gray-400 text-sm">Check-out</p>
-            <p>{new Date(bookingDetails.checkOut).toLocaleDateString()}</p>
-          </div>
-        </div>
-        <div className="border-t border-gray-700 pt-4">
-          <div className="flex justify-between mb-1">
-            <p className="text-gray-400">Subtotal</p>
-            <p>${bookingDetails.subtotal.toFixed(2)}</p>
-          </div>
-          <div className="flex justify-between mb-1">
-            <p className="text-gray-400">Tax (15%)</p>
-            <p>${bookingDetails.tax.toFixed(2)}</p>
-          </div>
-          <div className="flex justify-between font-bold text-xl text-white">
-            <p>Total</p>
-            <p>${bookingDetails.total.toFixed(2)}</p>
+          <div className="border-t border-gray-400 pt-4 text-black">
+            <div className="flex justify-between mb-1">
+              <p className="text-black">Subtotal</p>
+              <p>${bookingDetails.subtotal.toFixed(2)}</p>
+            </div>
+            <div className="flex justify-between mb-1">
+              <p className="text-black">Tax (15%)</p>
+              <p>${bookingDetails.tax.toFixed(2)}</p>
+            </div>
+            <div className="flex justify-between font-bold text-xl">
+              <p>Total</p>
+              <p>${bookingDetails.total.toFixed(2)}</p>
+            </div>
           </div>
         </div>
       </div>

@@ -134,90 +134,91 @@ const LoginSignup = () => {
   };
 
   return (
-    <div className="bg-black text-white min-h-screen flex items-center justify-center px-4">
-      <div className="bg-gray-900 p-8 rounded-xl w-full max-w-md shadow-lg">
-        <h2 className="text-3xl font-bold mb-6 text-center">
-          {isLogin ? 'Login to TravelApp' : 'Create an Account'}
-        </h2>
+    <div className="bg-gradient-to-br from-black via-gray-900 to-black text-white min-h-screen flex items-center justify-center px-4 font-sans">
+  <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl w-full max-w-md shadow-2xl border border-white/20">
+    <h2 className="text-4xl font-semibold mb-6 text-center tracking-wide">
+      {isLogin ? 'Welcome Back 👋' : 'Join Travelo 🚀'}
+    </h2>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {!isLogin && (
-            <>
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Username"
-                className="px-4 py-2 bg-gray-800 border border-gray-700 rounded focus:outline-none focus:ring"
-                required
-              />
-
-              <input
-                type="text"
-                name="contactNumber"
-                value={formData.contactNumber}
-                onChange={handleChange}
-                placeholder="Contact Number"
-                className="px-4 py-2 bg-gray-800 border border-gray-700 rounded focus:outline-none focus:ring"
-              />
-
-              <input
-                type="text"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                placeholder="Address"
-                className="px-4 py-2 bg-gray-800 border border-gray-700 rounded focus:outline-none focus:ring"
-              />
-            </>
-          )}
-
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-black">
+      {!isLogin && (
+        <>
           <input
-            type="email"
-            name="email"
-            value={formData.email}
+            type="text"
+            name="username"
+            value={formData.username}
             onChange={handleChange}
-            placeholder="Email"
-            className="px-4 py-2 bg-gray-800 border border-gray-700 rounded focus:outline-none focus:ring"
+            placeholder="Your Name"
+            className="px-4 py-3 bg-white/20 placeholder:text-black/60 text-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner transition"
             required
           />
 
           <input
-            type="password"
-            name="password"
-            value={formData.password}
+            type="text"
+            name="contactNumber"
+            value={formData.contactNumber}
             onChange={handleChange}
-            placeholder="Password"
-            className="px-4 py-2 bg-gray-800 border border-gray-700 rounded focus:outline-none focus:ring"
-            required
-            minLength={4}
+            placeholder="Contact Number"
+            className="px-4 py-3 bg-white/20 placeholder:text-black/60 text-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner transition"
           />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-white text-black py-2 rounded hover:bg-gray-200 transition"
-          >
-            {loading ? (isLogin ? 'Logging in...' : 'Signing up...') : (isLogin ? 'Login' : 'Sign Up')}
-          </button>
-        </form>
+          <input
+            type="text"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            placeholder="Address"
+            className="px-4 py-3 bg-white/20 placeholder:text-black/60 text-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner transition"
+          />
+        </>
+      )}
 
-        {error && (
-          <p className="text-red-500 mt-4 text-center">{error}</p>
-        )}
-        {successMessage && (
-          <p className="text-green-400 mt-4 text-center">{successMessage}</p>
-        )}
+      <input
+        type="email"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        placeholder="Email"
+        className="px-4 py-3 bg-white/20 placeholder:text-black/60 text-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner transition"
+        required
+      />
 
-        <p className="text-center text-sm text-gray-400 mt-6">
-          {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
-          <button onClick={toggleMode} className="text-white underline">
-            {isLogin ? 'Sign up' : 'Login'}
-          </button>
-        </p>
-      </div>
-    </div>
+      <input
+        type="password"
+        name="password"
+        value={formData.password}
+        onChange={handleChange}
+        placeholder="Password"
+        className="px-4 py-3 bg-white/20 placeholder:text-black/60 text-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner transition"
+        required
+        minLength={4}
+      />
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="bg-gradient-to-r from-blue-400 to-purple-500 text-white font-semibold py-3 rounded-xl mt-2 hover:opacity-90 shadow-lg hover:shadow-xl transition-all duration-200"
+      >
+        {loading ? (isLogin ? 'Logging in...' : 'Signing up...') : (isLogin ? 'Login' : 'Sign Up')}
+      </button>
+    </form>
+
+    {error && (
+      <p className="text-red-400 mt-4 text-center text-sm">{error}</p>
+    )}
+    {successMessage && (
+      <p className="text-green-400 mt-4 text-center text-sm">{successMessage}</p>
+    )}
+
+    <p className="text-center text-sm text-gray-300 mt-6">
+      {isLogin ? "Don't have an account?" : 'Already registered?'}{' '}
+      <button onClick={toggleMode} className="text-blue-300 underline hover:text-blue-400 transition">
+        {isLogin ? 'Sign Up' : 'Login'}
+      </button>
+    </p>
+  </div>
+</div>
+
   );
 };
 
