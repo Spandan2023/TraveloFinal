@@ -26,7 +26,7 @@ const LandingPage = () => {
       {/* 💎 Glass Card */}
       <div className="z-10 max-w-xl w-full bg-white/10 backdrop-blur-lg border border-white/30 shadow-xl rounded-3xl px-10 py-12 text-center">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-5 text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-purple-400 to-pink-500">
-          Welcome to TravelApp
+          Welcome to Travelo
         </h1>
         <p className="text-gray-200 text-lg md:text-xl mb-10 font-light">
           Plan your perfect trip with AI-powered itinerary planning, hotel booking, weather forecasting, and travel blogs — all in one place.

@@ -6,10 +6,10 @@ const Footer = () => {
     <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-black border-t border-gray-700 py-8 px-6 text-gray-300">
       <div className="max-w-7xl mx-auto text-center">
         <h2 className="text-lg font-semibold tracking-wide mb-2">
-          TravelApp – Make Every Journey Memorable ✈️
+          Travelo – Make Every Journey Memorable ✈️
         </h2>
         <p className="text-sm mb-4">
-          &copy; {new Date().getFullYear()} TravelApp. All rights reserved.
+          &copy; {new Date().getFullYear()} Travelo. All rights reserved.
         </p>
 
         <p className="text-sm mb-4">

@@ -28,7 +28,7 @@ const Homepage = () => {
       {/* 💎 Foreground Glass Card */}
       <div className="relative z-10 bg-black text-white rounded-3xl shadow-2xl border border-white/30 p-10 max-w-4xl w-full text-center backdrop-blur-lg">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-6 font-[Outfit] text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-400">
-          Explore the world with TravelApp
+          Explore the world with Travelo
         </h1>
         <p className="text-white/90 text-lg md:text-xl mb-8 max-w-2xl mx-auto font-light">
           ✈️ Plan trips, book hotels, check weather forecasts, and dive into stories from wanderers like you.

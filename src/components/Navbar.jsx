@@ -59,7 +59,7 @@ const Navbar = () => {
               alt="TravelApp Logo"
               className="w-10 h-10 rounded-full border-2 border-white shadow-md"
             />
-            <span>TravelApp</span>
+            <span>Travelo</span>
           </Link>
 
           {/* Desktop Nav */}
